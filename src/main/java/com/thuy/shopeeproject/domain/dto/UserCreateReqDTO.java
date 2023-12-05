@@ -12,6 +12,7 @@ import com.thuy.shopeeproject.domain.entity.UserAvatar;
 import com.thuy.shopeeproject.domain.enums.ERole;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,12 +25,14 @@ import lombok.Setter;
 public class UserCreateReqDTO implements Validator {
     private Long id;
 
-    @NotBlank(message = "Product name must not be blank")
+    @NotBlank(message = "Username must not be blank")
     private String username;
 
-    @NotBlank(message = "Product name must not be blank")
+    @NotBlank(message = "Password must not be blank")
     private String password;
 
+    @NotBlank(message = "Email must not be blank")
+    @Pattern(regexp = "^[\\w]+@([\\w-]+\\.)+[\\w-]{2,6}$", message = "Invalid email!!!")
     private String email;
     private String role;
     private MultipartFile file;
@@ -69,7 +72,7 @@ public class UserCreateReqDTO implements Validator {
                 .setEmail(email)
                 .setUsername(username)
                 .setPassword(password)
-                .setRole(ERole.valueOf(role));
+                .setRole(ERole.getByValue(role));
     }
 
     public User toUser() {
@@ -78,6 +81,6 @@ public class UserCreateReqDTO implements Validator {
                 .setEmail(email)
                 .setUsername(username)
                 .setPassword(password)
-                .setRole(ERole.valueOf(role));
+                .setRole(ERole.getByValue(role));
     }
 }

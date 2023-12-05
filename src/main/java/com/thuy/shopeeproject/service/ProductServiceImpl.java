@@ -16,11 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.thuy.shopeeproject.cloudinary.CloudinaryConfig;
-import com.thuy.shopeeproject.cloudinary.UploaderConfig;
-import com.thuy.shopeeproject.domain.dto.ProductAvatarDTO;
 import com.thuy.shopeeproject.domain.dto.ProductCreateReqDTO;
 import com.thuy.shopeeproject.domain.dto.ProductFilterReqDTO;
 import com.thuy.shopeeproject.domain.dto.ProductResDTO;

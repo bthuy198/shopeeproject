@@ -65,7 +65,7 @@ public class UploadfileUtils {
 
     }
 
-    public Map uploadToUserFolderCloudinary(MultipartFile file, String fileFolder) {
+    public Map uploadToUserFolderCloudinary(MultipartFile file) {
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudinaryName,
                 "api_key", cloudinaryApiKey,

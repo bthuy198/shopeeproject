@@ -2,6 +2,8 @@ package com.thuy.shopeeproject.domain.entity;
 
 import java.util.List;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import jakarta.persistence.*;
 
 import com.thuy.shopeeproject.domain.dto.UserCreateResDTO;
@@ -22,11 +24,11 @@ public class User extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name = "email")
+	@Column(name = "email", nullable = false)
 	private String email;
 	@Column(name = "password")
 	private String password;
-	@Column(name = "username", nullable = false, unique = true)
+	@Column(name = "username", nullable = false)
 	private String username;
 
 	@OneToOne
