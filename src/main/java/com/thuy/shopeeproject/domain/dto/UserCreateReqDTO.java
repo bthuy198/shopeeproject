@@ -75,12 +75,12 @@ public class UserCreateReqDTO implements Validator {
                 .setRole(ERole.getByValue(role));
     }
 
-    public User toUser() {
+    public User toUser(ERole role) {
         return new User()
                 .setId(id)
                 .setEmail(email)
                 .setUsername(username)
                 .setPassword(password)
-                .setRole(ERole.getByValue(role));
+                .setRole(role);
     }
 }

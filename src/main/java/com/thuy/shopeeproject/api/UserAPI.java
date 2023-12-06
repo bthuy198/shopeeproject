@@ -26,45 +26,43 @@ public class UserAPI {
     @Autowired
     private AppUtils appUtils;
 
-    @PostMapping("")
-    public ResponseEntity<?> createUser(UserCreateReqDTO userCreateReqDTO, BindingResult bindingResult) {
+    // @PostMapping("")
+    // public ResponseEntity<?> createUser(UserCreateReqDTO userCreateReqDTO,
+    // BindingResult bindingResult) {
 
-        String role = userCreateReqDTO.getRole();
+    // String role = userCreateReqDTO.getRole();
 
-        if (!isRoleValid(role)) {
-            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this user's role");
-        }
+    // if (!isRoleValid(role)) {
+    // throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this user's
+    // role");
+    // }
 
-        MultipartFile file = userCreateReqDTO.getFile();
+    // MultipartFile file = userCreateReqDTO.getFile();
 
-        if (file != null) {
-            new UserCreateReqDTO().validate(userCreateReqDTO, bindingResult);
-        }
+    // if (file != null) {
+    // new UserCreateReqDTO().validate(userCreateReqDTO, bindingResult);
+    // }
 
-        if (bindingResult.hasErrors()) {
-            return appUtils.mapErrorToResponse(bindingResult);
-        }
+    // if (bindingResult.hasErrors()) {
+    // return appUtils.mapErrorToResponse(bindingResult);
+    // }
 
-        User user = userService.save(userCreateReqDTO.toUser());
-        ;
+    // User user = userService.save(userCreateReqDTO.toUser());
+    // ;
 
-        if (file != null) {
-            user = userService.createWithAvatar(userCreateReqDTO, user);
-        } else {
-            user = userService.createNoAvatar(userCreateReqDTO, user);
-        }
+    // if (file != null) {
+    // user = userService.createWithAvatar(userCreateReqDTO, user);
+    // } else {
+    // user = userService.createNoAvatar(userCreateReqDTO, user);
+    // }
 
-        userService.save(user);
+    // userService.save(user);
 
-        return new ResponseEntity<>(user.toUserCreateResDTO(), HttpStatus.CREATED);
-    }
+    // return new ResponseEntity<>(user.toUserCreateResDTO(), HttpStatus.CREATED);
+    // }
 
-    public boolean isRoleValid(String role) {
-        for (ERole eRole : ERole.values()) {
-            if (eRole.getValue().equals(role)) {
-                return true;
-            }
-        }
-        return false;
+    @PostMapping()
+    public ResponseEntity<?> createUserInfo() {
+        return null;
     }
 }

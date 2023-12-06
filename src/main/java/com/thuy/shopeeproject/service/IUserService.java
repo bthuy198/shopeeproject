@@ -4,7 +4,7 @@ import com.thuy.shopeeproject.domain.dto.UserCreateReqDTO;
 import com.thuy.shopeeproject.domain.entity.User;
 
 public interface IUserService extends IService<User, Long> {
-    User createNoAvatar(UserCreateReqDTO userCreateReqDTO, User user);
+    User createNoAvatar(User user);
 
     User createWithAvatar(UserCreateReqDTO userCreateReqDTO, User user);
 

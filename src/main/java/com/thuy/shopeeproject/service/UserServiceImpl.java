@@ -67,12 +67,14 @@ public class UserServiceImpl implements IUserService {
     public User save(User e) {
         e.setPassword(passwordEncoder.encode(e.getPassword()));
 
-        if (userRepository.existsByUsername(e.getUsername())) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Username must be unique");
-        }
-        if (userRepository.existsByEmail(e.getEmail())) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Email must be unique");
-        }
+        // if (userRepository.existsByUsername(e.getUsername())) {
+        // throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Username must be
+        // unique");
+        // }
+        // if (userRepository.existsByEmail(e.getEmail())) {
+        // throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Email must be
+        // unique");
+        // }
 
         return userRepository.save(e);
 
@@ -89,7 +91,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User createNoAvatar(UserCreateReqDTO userCreateReqDTO, User user) {
+    public User createNoAvatar(User user) {
 
         UserAvatar userAvatar = new UserAvatar();
         userAvatarService.save(userAvatar);
@@ -142,14 +144,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Boolean existsByUsername(String username) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'existsByUsername'");
+        return userRepository.existsByUsername(username);
     }
 
     @Override
     public Boolean existsByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'existsByEmail'");
+        return userRepository.existsByEmail(email);
     }
 
 }
