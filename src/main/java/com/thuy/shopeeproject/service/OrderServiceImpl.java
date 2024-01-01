@@ -32,12 +32,14 @@ public class OrderServiceImpl implements IOrderService {
     private IOrderItemService orderItemService;
 
     @Autowired
+    private IBillService billService;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Override
     public List<Order> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return orderRepository.findAll();
     }
 
     @Override
@@ -47,6 +49,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public Order save(Order e) {
+
         return orderRepository.save(e);
     }
 
@@ -95,10 +98,14 @@ public class OrderServiceImpl implements IOrderService {
 
         order.setOrderItem(orderItems);
         order.setTotal(total);
-
         order.setOrderStatus(EOrderStatus.TO_PAY);
         order = orderRepository.save(order);
         return order;
+    }
+
+    @Override
+    public List<Order> findByOrderStatus(EOrderStatus orderStatus) {
+        return orderRepository.findByOrderStatus(orderStatus);
     }
 
 }

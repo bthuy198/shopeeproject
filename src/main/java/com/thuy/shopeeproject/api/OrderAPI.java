@@ -1,11 +1,14 @@
 package com.thuy.shopeeproject.api;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thuy.shopeeproject.domain.dto.CancelOrderReqDTO;
+import com.thuy.shopeeproject.domain.dto.CompleteOrderReqDTO;
 import com.thuy.shopeeproject.domain.dto.OrderCreateReqDTO;
 import com.thuy.shopeeproject.domain.dto.OrderItemCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.OrderResDTO;
 import com.thuy.shopeeproject.domain.entity.Cart;
 import com.thuy.shopeeproject.domain.entity.CartItem;
 import com.thuy.shopeeproject.domain.entity.Order;
@@ -34,6 +37,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -61,6 +65,57 @@ public class OrderAPI {
 
     @Autowired
     private ICartItemService cartItemService;
+
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllOrder(HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+
+        Optional<User> optionalUser = userService.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Please sign in to order");
+        }
+
+        List<Order> orders = orderService.findAll();
+
+        List<OrderResDTO> orderResDTOs = new ArrayList<>();
+
+        for (Order order : orders) {
+            OrderResDTO orderResDTO = order.toOrderResDTO();
+            orderResDTOs.add(orderResDTO);
+        }
+
+        return new ResponseEntity<>(orderResDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-by-status")
+    public ResponseEntity<?> getOrderByStatus(@RequestParam("order_status") String orderStatus,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+
+        Optional<User> optionalUser = userService.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Please sign in to order");
+        }
+
+        EOrderStatus eOrderStatus = EOrderStatus.fromString(orderStatus);
+
+        List<Order> ordersByStatus = new ArrayList<>();
+
+        if (eOrderStatus == EOrderStatus.ALL) {
+            ordersByStatus = orderService.findAll();
+        } else {
+            ordersByStatus = orderService.findByOrderStatus(eOrderStatus);
+        }
+
+        List<OrderResDTO> orderResDTOs = new ArrayList<>();
+
+        for (Order order : ordersByStatus) {
+            OrderResDTO orderResDTO = order.toOrderResDTO();
+            orderResDTOs.add(orderResDTO);
+        }
+
+        return new ResponseEntity<>(orderResDTOs, HttpStatus.OK);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderCreateReqDTO orderCreateReqDTO, HttpServletRequest request) {
@@ -131,6 +186,35 @@ public class OrderAPI {
             throw new CustomErrorException(HttpStatus.NOT_FOUND, "Can't cancel your order.");
         }
 
+        return new ResponseEntity<>(order.toOrderResDTO(), HttpStatus.OK);
+    }
+
+    @PostMapping("/complete-order")
+    public ResponseEntity<?> completeOrder(@RequestBody CompleteOrderReqDTO completeOrderReqDTO,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        Optional<User> optionalUser = userService.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Please sign in to complete order");
+        }
+
+        Optional<Order> optionalOrder = orderService.findById(completeOrderReqDTO.getOrderId());
+        if (!optionalOrder.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found your order.");
+        }
+
+        if (optionalOrder.get().getUser().getId() != optionalUser.get().getId()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "You do not have permission to confirm.");
+        }
+
+        Order order = optionalOrder.get();
+        EOrderStatus orderStatus = order.getOrderStatus();
+        if (orderStatus == EOrderStatus.TO_RECEIVE) {
+            order.setOrderStatus(EOrderStatus.COMPLETED);
+            order = orderService.save(order);
+        } else {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Can't confirm your order.");
+        }
         return new ResponseEntity<>(order.toOrderResDTO(), HttpStatus.OK);
     }
 
