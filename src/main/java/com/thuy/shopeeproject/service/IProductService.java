@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.thuy.shopeeproject.domain.dto.ProductCreateReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductFilterReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductUpdateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductFilterReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductUpdateReqDTO;
 import com.thuy.shopeeproject.domain.entity.Category;
 import com.thuy.shopeeproject.domain.entity.Product;
 

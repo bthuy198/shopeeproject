@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import com.thuy.shopeeproject.domain.dto.ProductAvatarDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductAvatarDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,9 +16,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="product_avatars")
+@Table(name = "product_avatars")
 public class ProductAvatar {
-	@Id
+    @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
@@ -35,27 +35,27 @@ public class ProductAvatar {
     @Column(name = "file_type")
     private String fileType;
 
-   @Column(name = "cloud_id")
-   private String cloudId;
+    @Column(name = "cloud_id")
+    private String cloudId;
 
     private Integer width;
     private Integer height;
-    
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-    
-    @Column(name="is_default")
+
+    @Column(name = "is_default")
     private Boolean isDefault = false;
 
-    public ProductAvatarDTO toProductAvatarDTO(){
+    public ProductAvatarDTO toProductAvatarDTO() {
         return new ProductAvatarDTO()
-        .setId(id)
-        .setCloudId(cloudId)
-        .setFileFolder(fileFolder)
-        .setFileName(fileName)
-        .setFileType(fileType)
-        .setFileUrl(fileUrl)
-        .setIsDefault(isDefault);
+                .setId(id)
+                .setCloudId(cloudId)
+                .setFileFolder(fileFolder)
+                .setFileName(fileName)
+                .setFileType(fileType)
+                .setFileUrl(fileUrl)
+                .setIsDefault(isDefault);
     }
 }

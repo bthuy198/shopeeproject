@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,24 +23,36 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Sort;
 
-import com.thuy.shopeeproject.domain.dto.ProductCreateReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductCreateResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductDetailResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductFilterReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductUpdateReqDTO;
+import com.thuy.shopeeproject.domain.dto.CartItemReqDTO;
+import com.thuy.shopeeproject.domain.dto.CartItemUpdateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductCreateResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductDetailResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductFilterReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductUpdateReqDTO;
+import com.thuy.shopeeproject.domain.entity.Cart;
+import com.thuy.shopeeproject.domain.entity.CartItem;
 import com.thuy.shopeeproject.domain.entity.Category;
 import com.thuy.shopeeproject.domain.entity.Product;
 import com.thuy.shopeeproject.domain.entity.ProductDetail;
+import com.thuy.shopeeproject.domain.entity.Size;
 import com.thuy.shopeeproject.exceptions.CustomErrorException;
+import com.thuy.shopeeproject.service.ICartItemService;
+import com.thuy.shopeeproject.service.ICartService;
 import com.thuy.shopeeproject.service.ICategoryService;
+import com.thuy.shopeeproject.service.IProductDetailService;
 import com.thuy.shopeeproject.service.IProductService;
+import com.thuy.shopeeproject.service.ISizeService;
 import com.thuy.shopeeproject.utils.AppUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/products")
@@ -48,12 +61,25 @@ public class ProductAPI {
     private IProductService productService;
 
     @Autowired
+    private IProductDetailService productDetailService;
+
+    @Autowired
     private ICategoryService categoryService;
+
+    @Autowired
+    private ICartService cartService;
+
+    @Autowired
+    private ICartItemService cartItemService;
+
+    @Autowired
+    private ISizeService sizeService;
 
     @Autowired
     private AppUtils appUtils;
 
     @GetMapping("/get-all")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> getAllProduct(@Validated ProductFilterReqDTO productFilterReqDTO,
             BindingResult bindingResult,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
@@ -197,4 +223,44 @@ public class ProductAPI {
         productService.delete(optionalProduct.get());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/{productId}/add-to-cart")
+    public ResponseEntity<?> addToCart(@PathVariable Long productId,
+            @RequestBody CartItemReqDTO cartItemReqDTO,
+            HttpServletRequest request) {
+
+        ProductDetail productDetail = productDetailService.findByProductIdAndSize(productId,
+                cartItemReqDTO.getSizeId());
+        if (productDetail == null) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product detail");
+        }
+
+        Long cartId = (Long) request.getSession().getAttribute("cartId");
+        Optional<Cart> optionalCart = cartService.findById(cartId);
+        if (!optionalCart.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found your cart");
+        }
+
+        CartItem existsCartItem = cartItemService.findByDetailIdAndCartId(productDetail.getId(), cartId);
+
+        if (existsCartItem != null) {
+            Long newQuantity = cartItemReqDTO.getQuantity() + existsCartItem.getQuantity();
+            existsCartItem.setQuantity(newQuantity);
+            BigDecimal totalPrice = productDetail.getPrice().multiply(BigDecimal.valueOf(existsCartItem.getQuantity()));
+            existsCartItem.setTotalPrice(totalPrice);
+            existsCartItem = cartItemService.save(existsCartItem);
+            return new ResponseEntity<>(existsCartItem.toCartItemResDTO(), HttpStatus.OK);
+        }
+
+        CartItem cartItem = new CartItem(productDetail, cartItemReqDTO.getQuantity());
+
+        Cart cart = optionalCart.get();
+
+        cartItem.setCart(cart);
+        cart = cartService.save(cart);
+        cartItem = cartItemService.save(cartItem);
+
+        return new ResponseEntity<>(cartItem.toCartItemResDTO(), HttpStatus.OK);
+    }
+
 }

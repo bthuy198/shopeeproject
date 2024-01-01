@@ -1,21 +1,18 @@
-package com.thuy.shopeeproject.service;
+package com.thuy.shopeeproject.domain.entity;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.thuy.shopeeproject.domain.entity.User;
 import com.thuy.shopeeproject.domain.enums.ERole;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserPrincipal implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -27,28 +24,37 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private SimpleGrantedAuthority authority;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String email, String password,
-            Collection<? extends GrantedAuthority> authorities) {
+    private String role;
+
+    public UserPrincipal(Long id, String username, String email, String password,
+            Collection<? extends GrantedAuthority> authorities, ERole eRole) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.role = eRole.getValue();
     }
 
-    public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = EnumSet.allOf(ERole.class).stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .collect(Collectors.toList());
+    public static UserPrincipal build(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getValue());
+        authorities.add(authority);
+        // List<GrantedAuthority> authorities = user.getRole().stream()
+        // .map(role -> new SimpleGrantedAuthority(role.name()))
+        // .collect(Collectors.toList());
 
-        return new UserDetailsImpl(
+        return new UserPrincipal(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities);
+                authorities,
+                user.getRole());
     }
 
     @Override
@@ -100,7 +106,7 @@ public class UserDetailsImpl implements UserDetails {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        UserDetailsImpl user = (UserDetailsImpl) o;
+        UserPrincipal user = (UserPrincipal) o;
         return Objects.equals(id, user.id);
     }
 }

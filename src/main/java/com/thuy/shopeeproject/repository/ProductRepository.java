@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import com.thuy.shopeeproject.domain.dto.ProductFilterReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductFilterReqDTO;
 import com.thuy.shopeeproject.domain.entity.Product;
 
 import jakarta.persistence.criteria.Predicate;

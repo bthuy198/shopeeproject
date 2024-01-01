@@ -6,11 +6,11 @@ import java.util.List;
 import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.thuy.shopeeproject.domain.dto.ProductAvatarDTO;
-import com.thuy.shopeeproject.domain.dto.ProductCreateResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductDetailCreateResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductDetailResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductAvatarDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductCreateResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductDetailCreateResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductDetailResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductResDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

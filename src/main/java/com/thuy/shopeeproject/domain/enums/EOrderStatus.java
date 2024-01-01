@@ -7,12 +7,16 @@ public enum EOrderStatus {
 	COMPLETED("Completed"),
 	CANCELLED("Cancelled"),
 	RETURN_REFUND("Return/ Refund");
-	
+
 	private String value;
-	
+
 	EOrderStatus(String value) {
 		// TODO Auto-generated constructor stub
 		this.value = value;
 	}
-	
+
+	public String getValue() {
+		return this.value;
+	}
+
 }

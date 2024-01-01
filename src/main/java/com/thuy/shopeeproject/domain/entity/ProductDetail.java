@@ -2,11 +2,10 @@ package com.thuy.shopeeproject.domain.entity;
 
 import java.math.BigDecimal;
 
+import com.thuy.shopeeproject.domain.dto.product.ProductDetailCreateResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductDetailResDTO;
+
 import jakarta.persistence.*;
-
-import com.thuy.shopeeproject.domain.dto.ProductDetailCreateResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductDetailResDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

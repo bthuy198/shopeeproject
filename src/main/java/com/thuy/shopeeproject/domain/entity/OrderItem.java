@@ -2,6 +2,8 @@ package com.thuy.shopeeproject.domain.entity;
 
 import java.math.BigDecimal;
 
+import com.thuy.shopeeproject.domain.dto.OrderItemResDTO;
+
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -14,24 +16,40 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="order_item")
+@Table(name = "order_item")
 public class OrderItem extends BaseEntity {
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne
-    @JoinColumn(name="order_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
 	private Order order;
-	
-	@OneToOne
-    @JoinColumn(name = "product_id")
-	private Product product;
-	private Long quantity;
-	private BigDecimal unitPrice;
-	private BigDecimal totalPrice;
-	
+
 	@ManyToOne
-    @JoinColumn(name="cart_id", referencedColumnName = "id", nullable = false)
-	private Cart cart;
+	@JoinColumn(name = "product_id")
+	private Product product;
+
+	@Column(name = "quantity")
+	private Long quantity;
+
+	@Column(name = "unit_price")
+	private BigDecimal unitPrice;
+
+	@Column(name = "total_price")
+	private BigDecimal totalPrice;
+
+	@Column(name = "size")
+	private String size;
+
+	public OrderItemResDTO toOrderItemResDTO() {
+		return new OrderItemResDTO()
+				.setId(id)
+				.setProduct(product.toProductResDTO())
+				.setQuantity(quantity)
+				.setSize(size)
+				.setUnitPrice(unitPrice)
+				.setTotalPrice(totalPrice);
+	}
+
 }

@@ -1,6 +1,6 @@
 package com.thuy.shopeeproject.api;
 
-import java.util.HashSet;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,16 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thuy.shopeeproject.domain.dto.UserCreateReqDTO;
 import com.thuy.shopeeproject.domain.dto.UserLoginReqDTO;
-import com.thuy.shopeeproject.domain.dto.UserLoginResDTO;
+import com.thuy.shopeeproject.domain.entity.Cart;
 import com.thuy.shopeeproject.domain.entity.User;
+import com.thuy.shopeeproject.domain.entity.UserPrincipal;
 import com.thuy.shopeeproject.domain.enums.ERole;
 import com.thuy.shopeeproject.exceptions.CustomErrorException;
 import com.thuy.shopeeproject.exceptions.MessageResponse;
 import com.thuy.shopeeproject.security.jwt.JwtUtils;
+import com.thuy.shopeeproject.service.ICartService;
 import com.thuy.shopeeproject.service.IUserService;
-import com.thuy.shopeeproject.service.UserDetailsImpl;
 import com.thuy.shopeeproject.utils.AppUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -42,7 +45,10 @@ public class AuthAPI {
         private IUserService userService;
 
         @Autowired
-        PasswordEncoder encoder;
+        private ICartService cartService;
+
+        @Autowired
+        PasswordEncoder passwordEncoder;
 
         @Autowired
         JwtUtils jwtUtils;
@@ -51,7 +57,8 @@ public class AuthAPI {
         private AppUtils appUtils;
 
         @PostMapping("/signin")
-        public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO) {
+        public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserLoginReqDTO userLoginReqDTO,
+                        HttpServletRequest request) {
 
                 Authentication authentication = authenticationManager
                                 .authenticate(new UsernamePasswordAuthenticationToken(userLoginReqDTO.getUsername(),
@@ -59,20 +66,29 @@ public class AuthAPI {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+                User user = userService.findById(userPrincipal.getId()).get();
+
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userPrincipal);
 
                 String jwt = jwtCookie.getValue();
+
+                HttpSession session = request.getSession();
+                session.setAttribute("userId", user.getId());
+                session.setAttribute("cartId", user.getCart().getId());
 
                 // List<String> roles = userDetails.getAuthorities().stream()
                 // .map(item -> item.getAuthority())
                 // .collect(Collectors.toList());
 
+                // return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
+                // jwtCookie.toString())
+                // .body(new UserLoginResDTO(userDetails.getId(),
+                // userDetails.getUsername(),
+                // userDetails.getEmail()));
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new UserLoginResDTO(userDetails.getId(),
-                                                userDetails.getUsername(),
-                                                userDetails.getEmail()));
+                                .body(userPrincipal);
         }
 
         @PostMapping("/signup")
@@ -113,9 +129,15 @@ public class AuthAPI {
 
                 user = userCreateReqDTO.toUser(userRole);
 
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+
                 user = userService.save(user);
 
                 user = userService.createNoAvatar(user);
+
+                Cart cart = cartService.createCart(user);
+                user.setCart(cart);
+                userService.save(user);
 
                 return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         }

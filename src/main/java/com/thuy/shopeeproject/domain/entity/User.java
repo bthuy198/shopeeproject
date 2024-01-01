@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 import jakarta.persistence.*;
 
 import com.thuy.shopeeproject.domain.dto.UserCreateResDTO;
+import com.thuy.shopeeproject.domain.dto.user.UserResDTO;
 import com.thuy.shopeeproject.domain.enums.ERole;
 
 import lombok.AllArgsConstructor;
@@ -58,6 +59,25 @@ public class User extends BaseEntity {
 				.setUsername(username)
 				.setPassword(password)
 				.setRole(role.toString())
+				.setUserAvatar(avatar.toUserAvatarDTO());
+	}
+
+	public UserResDTO toUserResDTO() {
+		return new UserResDTO()
+				.setId(id)
+				.setEmail(email)
+				.setUsername(username)
+				.setRole(role.toString())
+				.setUserAvatar(avatar.toUserAvatarDTO());
+	}
+
+	public UserResDTO toUserResDTO(UserInfo userInfo) {
+		return new UserResDTO()
+				.setId(id)
+				.setEmail(email)
+				.setUsername(username)
+				.setRole(role.toString())
+				.setUserInfo(userInfo.toUserInfoResDTO())
 				.setUserAvatar(avatar.toUserAvatarDTO());
 	}
 }

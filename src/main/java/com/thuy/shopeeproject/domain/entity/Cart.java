@@ -14,16 +14,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="carts")
+@Table(name = "carts")
 public class Cart extends BaseEntity {
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@OneToOne
-    @JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id")
 	private User user;
-	
+
 	@OneToMany(mappedBy = "cart")
-	private List<OrderItem> orderItems;
+	private List<CartItem> cartItems;
 }

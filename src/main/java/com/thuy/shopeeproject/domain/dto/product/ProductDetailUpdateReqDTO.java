@@ -1,4 +1,4 @@
-package com.thuy.shopeeproject.domain.dto;
+package com.thuy.shopeeproject.domain.dto.product;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;

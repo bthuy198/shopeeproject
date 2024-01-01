@@ -4,6 +4,7 @@ import java.util.Date;
 
 import jakarta.persistence.*;
 
+import com.thuy.shopeeproject.domain.dto.user.UserInfoResDTO;
 import com.thuy.shopeeproject.domain.enums.EGender;
 
 import lombok.AllArgsConstructor;
@@ -37,4 +38,13 @@ public class UserInfo extends BaseEntity {
 
 	@Column(name = "birthday")
 	private Date birthday;
+
+	public UserInfoResDTO toUserInfoResDTO() {
+		return new UserInfoResDTO()
+				.setId(id)
+				.setName(name)
+				.setGender(gender.getValue())
+				.setBirthday(birthday)
+				.setPhone(phone);
+	}
 }

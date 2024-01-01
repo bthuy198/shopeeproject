@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thuy.shopeeproject.domain.dto.ProductCreateReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductFilterReqDTO;
-import com.thuy.shopeeproject.domain.dto.ProductResDTO;
-import com.thuy.shopeeproject.domain.dto.ProductUpdateReqDTO;
 import com.thuy.shopeeproject.domain.entity.ProductAvatar;
+import com.thuy.shopeeproject.domain.dto.product.ProductCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductFilterReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductResDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductUpdateReqDTO;
 import com.thuy.shopeeproject.domain.entity.Category;
 import com.thuy.shopeeproject.domain.entity.Product;
 import com.thuy.shopeeproject.domain.entity.ProductDetail;

@@ -13,7 +13,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
-import com.thuy.shopeeproject.service.UserDetailsImpl;
+import com.thuy.shopeeproject.domain.entity.UserPrincipal;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -41,7 +41,7 @@ public class JwtUtils {
         }
     }
 
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
+    public ResponseCookie generateJwtCookie(UserPrincipal userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true)
                 .build();

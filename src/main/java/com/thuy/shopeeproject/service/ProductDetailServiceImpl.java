@@ -44,4 +44,9 @@ public class ProductDetailServiceImpl implements IProductDetailService {
         productDetailRepository.deleteById(id);
     }
 
+    @Override
+    public ProductDetail findByProductIdAndSize(Long productId, Long sizeId) {
+        return productDetailRepository.findByProductIdAndSize(productId, sizeId);
+    }
+
 }

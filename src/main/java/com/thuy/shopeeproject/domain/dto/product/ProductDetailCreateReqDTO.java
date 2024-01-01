@@ -1,4 +1,4 @@
-package com.thuy.shopeeproject.domain.dto;
+package com.thuy.shopeeproject.domain.dto.product;
 
 import java.math.BigDecimal;
 

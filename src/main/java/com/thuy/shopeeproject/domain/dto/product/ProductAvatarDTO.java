@@ -1,4 +1,4 @@
-package com.thuy.shopeeproject.domain.dto;
+package com.thuy.shopeeproject.domain.dto.product;
 
 import com.thuy.shopeeproject.domain.entity.ProductAvatar;
 import com.thuy.shopeeproject.domain.entity.Product;
@@ -23,16 +23,16 @@ public class ProductAvatarDTO {
     private Integer height;
     private Boolean isDefault;
 
-    public ProductAvatar toAvatar(Product product){
+    public ProductAvatar toAvatar(Product product) {
         return new ProductAvatar()
-        .setId(id)
-        .setFileName(fileName)
-        .setFileFolder(fileFolder)
-        .setFileUrl(fileUrl)
-        .setFileType(fileType)
-        .setCloudId(cloudId)
-        .setHeight(height)
-        .setWidth(width)
-        .setProduct(product);
+                .setId(id)
+                .setFileName(fileName)
+                .setFileFolder(fileFolder)
+                .setFileUrl(fileUrl)
+                .setFileType(fileType)
+                .setCloudId(cloudId)
+                .setHeight(height)
+                .setWidth(width)
+                .setProduct(product);
     }
 }

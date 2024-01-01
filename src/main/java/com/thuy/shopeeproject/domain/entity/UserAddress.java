@@ -1,5 +1,7 @@
 package com.thuy.shopeeproject.domain.entity;
 
+import com.thuy.shopeeproject.domain.dto.user.UserAddressDTO;
+
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -12,24 +14,29 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="user_address")
+@Table(name = "user_address")
 public class UserAddress extends BaseEntity {
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
-	@Column(name="phone")
+	@Column(name = "phone")
 	private String phone;
-	@Column(name="address")
+	@Column(name = "address")
 	private String address;
-	@Column(name="is_default")
+	@Column(name = "is_default")
 	private Boolean isDefault = false;
-	
+
 	@ManyToOne
-    @JoinColumn(name="users_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "users_id", referencedColumnName = "id", nullable = false)
 	private User user;
-	
-	@OneToOne(mappedBy = "address")
-	private Order order;
+
+	public UserAddressDTO toUserAddressDTO() {
+		return new UserAddressDTO()
+				.setAddress(address)
+				.setName(name)
+				.setPhone(phone);
+	}
+
 }

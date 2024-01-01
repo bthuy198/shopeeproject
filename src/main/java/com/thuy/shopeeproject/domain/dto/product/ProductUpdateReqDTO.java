@@ -1,4 +1,4 @@
-package com.thuy.shopeeproject.domain.dto;
+package com.thuy.shopeeproject.domain.dto.product;
 
 import java.util.Arrays;
 import java.util.List;

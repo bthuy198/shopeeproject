@@ -7,9 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,11 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thuy.shopeeproject.domain.dto.UserCreateReqDTO;
 import com.thuy.shopeeproject.domain.entity.User;
 import com.thuy.shopeeproject.domain.entity.UserAvatar;
-import com.thuy.shopeeproject.exceptions.CustomErrorException;
+import com.thuy.shopeeproject.domain.entity.UserPrincipal;
 import com.thuy.shopeeproject.repository.UserRepository;
 import com.thuy.shopeeproject.utils.UploadfileUtils;
-
-import jakarta.validation.ConstraintViolationException;
 
 @ConfigurationProperties(prefix = "application.cloudinary")
 @Service
@@ -33,9 +30,6 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IUserAvatarService userAvatarService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UploadfileUtils uploadfileUtils;
@@ -65,17 +59,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User save(User e) {
-        e.setPassword(passwordEncoder.encode(e.getPassword()));
-
-        // if (userRepository.existsByUsername(e.getUsername())) {
-        // throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Username must be
-        // unique");
-        // }
-        // if (userRepository.existsByEmail(e.getEmail())) {
-        // throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Email must be
-        // unique");
-        // }
-
         return userRepository.save(e);
 
     }
@@ -150,6 +133,20 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+
+        return UserPrincipal.build(user);
     }
 
 }
