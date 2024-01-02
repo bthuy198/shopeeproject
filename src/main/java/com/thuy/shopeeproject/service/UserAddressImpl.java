@@ -19,8 +19,7 @@ public class UserAddressImpl implements IUserAddressService {
 
     @Override
     public List<UserAddress> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return userAddressRepository.findAll();
     }
 
     @Override
@@ -35,8 +34,8 @@ public class UserAddressImpl implements IUserAddressService {
 
     @Override
     public void delete(UserAddress e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        e.setIsDefault(true);
+        e = userAddressRepository.save(e);
     }
 
     @Override

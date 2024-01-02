@@ -20,7 +20,7 @@ import com.thuy.shopeeproject.utils.AppUtils;
 public class UserInfoServiceImpl implements IUserInfoService {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private UserInfoRepository userInfoRepository;
@@ -30,8 +30,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
 
     @Override
     public List<UserInfo> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return userInfoRepository.findAll();
     }
 
     @Override
@@ -66,7 +65,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
         UserInfo userInfo = userInfoCreateReqDTO.toUserInfo(user, birthday);
         userInfo = userInfoRepository.save(userInfo);
         user.setUserInfo(userInfo);
-        userRepository.save(user);
+        userService.save(user);
         return userInfo;
     }
 

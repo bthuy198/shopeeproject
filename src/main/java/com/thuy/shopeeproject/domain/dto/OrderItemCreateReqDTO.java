@@ -17,16 +17,4 @@ import lombok.Setter;
 @Setter
 public class OrderItemCreateReqDTO {
     private Long cartItemId;
-
-    // public OrderItem toOrderItem(Order order, Product product) {
-    // BigDecimal itemUnitPrice = BigDecimal.valueOf(Long.valueOf(unitPrice));
-    // BigDecimal totalPrice =
-    // itemUnitPrice.multiply(BigDecimal.valueOf(Long.valueOf(quantity)));
-    // return new OrderItem()
-    // .setOrder(order)
-    // .setProduct(product)
-    // .setQuantity(Long.valueOf(quantity))
-    // .setUnitPrice(itemUnitPrice)
-    // .setTotalPrice(totalPrice);
-    // }
 }

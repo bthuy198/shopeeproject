@@ -19,8 +19,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public List<Bill> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return billRepository.findAll();
     }
 
     @Override
@@ -35,8 +34,8 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public void delete(Bill e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        e.setDeleted(true);
+        e = billRepository.save(e);
     }
 
     @Override

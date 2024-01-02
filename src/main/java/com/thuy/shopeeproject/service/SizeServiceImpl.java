@@ -40,5 +40,10 @@ public class SizeServiceImpl implements ISizeService {
     public void deleteById(Long id) {
         sizeRepository.deleteById(id);
     }
-    
+
+    @Override
+    public Size findSizeBySize(String size) {
+        return sizeRepository.findSizeBySize(size);
+    }
+
 }

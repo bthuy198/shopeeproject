@@ -48,8 +48,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<User> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return userRepository.findAll();
     }
 
     @Override
@@ -65,7 +64,8 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void delete(User e) {
-        userRepository.delete(e);
+        e.setDeleted(true);
+        e = userRepository.save(e);
     }
 
     @Override

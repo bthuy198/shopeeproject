@@ -11,4 +11,6 @@ public interface IOrderService extends IService<Order, Long> {
     Order createOrder(Order order, Cart cart, OrderCreateReqDTO orderCreateReqDTO);
 
     List<Order> findByOrderStatus(EOrderStatus orderStatus);
+
+    Order cancelOrder(Order order);
 }

@@ -241,24 +241,7 @@ public class ProductAPI {
             throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found your cart");
         }
 
-        CartItem existsCartItem = cartItemService.findByDetailIdAndCartId(productDetail.getId(), cartId);
-
-        if (existsCartItem != null) {
-            Long newQuantity = cartItemReqDTO.getQuantity() + existsCartItem.getQuantity();
-            existsCartItem.setQuantity(newQuantity);
-            BigDecimal totalPrice = productDetail.getPrice().multiply(BigDecimal.valueOf(existsCartItem.getQuantity()));
-            existsCartItem.setTotalPrice(totalPrice);
-            existsCartItem = cartItemService.save(existsCartItem);
-            return new ResponseEntity<>(existsCartItem.toCartItemResDTO(), HttpStatus.OK);
-        }
-
-        CartItem cartItem = new CartItem(productDetail, cartItemReqDTO.getQuantity());
-
-        Cart cart = optionalCart.get();
-
-        cartItem.setCart(cart);
-        cart = cartService.save(cart);
-        cartItem = cartItemService.save(cartItem);
+        CartItem cartItem = cartItemService.addToCart(optionalCart.get(), productDetail, cartItemReqDTO);
 
         return new ResponseEntity<>(cartItem.toCartItemResDTO(), HttpStatus.OK);
     }

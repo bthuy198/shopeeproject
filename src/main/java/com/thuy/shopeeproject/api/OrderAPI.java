@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("api/order")
+@RequestMapping("api/users/orders")
 public class OrderAPI {
 
     @Autowired
@@ -67,7 +67,18 @@ public class OrderAPI {
     private ICartItemService cartItemService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllOrder(HttpServletRequest request) {
+    public ResponseEntity<?> getAll() {
+        List<Order> orders = orderService.findAll();
+        List<OrderResDTO> orderResDTOs = new ArrayList<>();
+        for (Order order : orders) {
+            OrderResDTO orderResDTO = order.toOrderResDTO();
+            orderResDTOs.add(orderResDTO);
+        }
+        return new ResponseEntity<>(orderResDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllOrderByUser(HttpServletRequest request) {
         Long userId = (Long) request.getSession().getAttribute("userId");
 
         Optional<User> optionalUser = userService.findById(userId);
@@ -180,8 +191,7 @@ public class OrderAPI {
         Order order = optionalOrder.get();
         EOrderStatus orderStatus = order.getOrderStatus();
         if (orderStatus == EOrderStatus.TO_PAY) {
-            order.setOrderStatus(EOrderStatus.CANCELLED);
-            order = orderService.save(order);
+            order = orderService.cancelOrder(order);
         } else {
             throw new CustomErrorException(HttpStatus.NOT_FOUND, "Can't cancel your order.");
         }

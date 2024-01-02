@@ -20,8 +20,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public List<Cart> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return cartRepository.findAll();
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.thuy.shopeeproject.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thuy.shopeeproject.domain.dto.user.UserInfoCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.user.UserInfoResDTO;
 import com.thuy.shopeeproject.domain.dto.user.UserInfoUpdateReqDTO;
+import com.thuy.shopeeproject.domain.dto.user.UserResDTO;
 import com.thuy.shopeeproject.domain.entity.User;
 import com.thuy.shopeeproject.domain.entity.UserInfo;
 import com.thuy.shopeeproject.exceptions.CustomErrorException;
@@ -26,7 +30,10 @@ import com.thuy.shopeeproject.exceptions.MessageResponse;
 import com.thuy.shopeeproject.service.IUserInfoService;
 import com.thuy.shopeeproject.service.IUserService;
 import com.thuy.shopeeproject.utils.AppUtils;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("api/users")
@@ -39,6 +46,28 @@ public class UserAPI {
 
     @Autowired
     private AppUtils appUtils;
+
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllUsers() {
+        List<User> users = userService.findAll();
+        List<UserResDTO> userResDTOs = new ArrayList<>();
+        for (User user : users) {
+            UserResDTO userResDTO = user.toUserResDTO();
+            userResDTOs.add(userResDTO);
+        }
+        return new ResponseEntity<>(userResDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/infos")
+    public ResponseEntity<?> getAllUserInfos() {
+        List<UserInfo> userInfos = userInfoService.findAll();
+        List<UserInfoResDTO> userInfoResDTOs = new ArrayList<>();
+        for (UserInfo userInfo : userInfos) {
+            UserInfoResDTO userResDTO = userInfo.toUserInfoResDTO();
+            userInfoResDTOs.add(userResDTO);
+        }
+        return new ResponseEntity<>(userInfoResDTOs, HttpStatus.OK);
+    }
 
     @GetMapping("/info")
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
@@ -144,5 +173,11 @@ public class UserAPI {
             return new ResponseEntity<>(userInfo.toUserInfoResDTO(), HttpStatus.OK);
         }
         return new ResponseEntity<>("Login to action this", HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUser(@RequestParam("userId") Long userId) {
+
+        return null;
     }
 }

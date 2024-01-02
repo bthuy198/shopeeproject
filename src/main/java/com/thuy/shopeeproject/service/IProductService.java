@@ -23,4 +23,5 @@ public interface IProductService extends IService<Product, Long> {
     Product updateProductNoAvatar(ProductUpdateReqDTO productUpdateReqDTO, Product product, Category category);
 
     Product updateProductWithAvatar(ProductUpdateReqDTO productUpdateReqDTO, Product product);
+
 }
