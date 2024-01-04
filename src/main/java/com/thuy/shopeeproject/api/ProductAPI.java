@@ -52,9 +52,11 @@ import com.thuy.shopeeproject.service.IProductService;
 import com.thuy.shopeeproject.service.ISizeService;
 import com.thuy.shopeeproject.utils.AppUtils;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@SecurityRequirement(name = "javainuseapi")
 @RequestMapping("/api/products")
 public class ProductAPI {
     @Autowired

@@ -7,8 +7,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -55,33 +57,37 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // .authorizeHttpRequests((requests) -> requests
-                // .requestMatchers("/", "/home", "/api/**", "/**").permitAll()
-                // .anyRequest())
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .permitAll())
-                // .logout((logout) -> logout.permitAll());
-                .authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
-                .csrf(AbstractHttpConfigurer::disable);
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((authorize) -> authorize
+                        // Allow access to Swagger
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
+                        .permitAll()
+                        // Authenticate all other requests
+                        .anyRequest().permitAll());
+        // http
+        // .formLogin((form) -> form
+        // .loginPage("/login")
+        // .permitAll())
+        // // .logout((logout) -> logout.permitAll());
+        // .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**")
+        // .permitAll()
+        // .anyRequest()
+        // .authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
+        // .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
 
-    // This second filter chain will secure the static resources without reading the
-    // SecurityContext from the session.
-    // @Bean
-    // @Order(0)
-    // SecurityFilterChain resources(HttpSecurity http) throws Exception {
-    // http
-    // .requestMatchers((matchers) -> matchers.antMatchers("/resources/**",
-    // "/static/**", "/css/**", "/js/**",
-    // "/images/**"))
-    // .authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
-    // .requestCache().disable()
-    // .securityContext().disable()
-    // .sessionManagement().disable();
-
-    // return http.build();
+    // @Override
+    // public void configure(WebSecurity web) throws Exception {
+    // web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**",
+    // "/swagger-ui.html");
     // }
+
 }
