@@ -21,6 +21,7 @@ import com.thuy.shopeeproject.domain.dto.product.ProductCreateReqDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductFilterReqDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductResDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductUpdateReqDTO;
+import com.thuy.shopeeproject.domain.entity.CartItem;
 import com.thuy.shopeeproject.domain.entity.Category;
 import com.thuy.shopeeproject.domain.entity.Product;
 import com.thuy.shopeeproject.domain.entity.ProductDetail;
@@ -45,6 +46,9 @@ public class ProductServiceImpl implements IProductService {
     private IProductAvatarService productAvatarService;
 
     @Autowired
+    private ICartItemService cartItemService;
+
+    @Autowired
     private UploadfileUtils uploadfileUtils;
 
     @Value("${application.cloudinary.server-name}")
@@ -65,8 +69,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<ProductResDTO> findAll(ProductFilterReqDTO productFilterReqDTO, Pageable pageable) {
-        return productRepository.findAll(productFilterReqDTO, pageable).map(Product::toProductResDTO);
+    public Page<ProductResDTO> findAllProduct(ProductFilterReqDTO productFilterReqDTO, Pageable pageable) {
+        return productRepository.findAllProduct(productFilterReqDTO, pageable).map(Product::toProductResDTO);
     }
 
     @Override
@@ -112,8 +116,9 @@ public class ProductServiceImpl implements IProductService {
         productAvatar.setFileUrl(cloudinaryDefaultImage);
         productAvatar.setProduct(product);
         productAvatar.setCloudId("shopee_project/product/" + productAvatar.getCloudId());
-        productAvatar.setFileName(productAvatar.getId() + ".jpg");
-        productAvatarService.save(productAvatar);
+        productAvatar = productAvatarService.save(productAvatar);
+        productAvatar.setFileName("null_" + product.getId() + ".jpg");
+        productAvatar = productAvatarService.save(productAvatar);
 
         product.setProductDetails(productDetails);
         return productRepository.save(product);
@@ -153,7 +158,7 @@ public class ProductServiceImpl implements IProductService {
             if (i == 0) {
                 avatar.setIsDefault(true);
             }
-            productAvatarService.save(avatar);
+            avatar = productAvatarService.save(avatar);
             avatars.add(avatar);
 
             // upload ảnh
@@ -164,7 +169,6 @@ public class ProductServiceImpl implements IProductService {
             Integer height = (Integer) uploadResult.get("height");
 
             // set các giá trị theo giá trị sinh ra trên cloudinary
-            avatar.setFileName(avatar.getId() + "." + fileFormat);
             avatar.setFileType(fileFormat);
             avatar.setFileUrl(fileUrl);
             avatar.setFileFolder(cloudinaryDefaultFolderProduct);
@@ -172,8 +176,9 @@ public class ProductServiceImpl implements IProductService {
             avatar.setWidth(width);
             avatar.setHeight(height);
             avatar.setProduct(product);
-            productAvatarService.save(avatar);
-
+            avatar = productAvatarService.save(avatar);
+            avatar.setFileName(avatar.getId() + "." + fileFormat);
+            avatar = productAvatarService.save(avatar);
         }
         product.setProductAvatars(avatars);
         return avatars;
@@ -200,6 +205,20 @@ public class ProductServiceImpl implements IProductService {
         Product newProduct = productUpdateReqDTO.toProduct(product, category);
         newProduct.setId(product.getId());
         return productRepository.save(newProduct);
+    }
+
+    @Override
+    public void deleteProduct(Product p) {
+        List<ProductDetail> productDetails = p.getProductDetails();
+        for (ProductDetail detail : productDetails) {
+            CartItem cartItem = cartItemService.findByDetailId(detail.getId());
+            if (cartItem != null) {
+                cartItemService.delete(cartItem);
+            }
+        }
+
+        p.setDeleted(true);
+        p = productRepository.save(p);
     }
 
 }

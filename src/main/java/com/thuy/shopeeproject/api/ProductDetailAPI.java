@@ -6,7 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,16 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thuy.shopeeproject.domain.dto.product.ProductDetailUpdateReqDTO;
-import com.thuy.shopeeproject.domain.entity.CartItem;
 import com.thuy.shopeeproject.domain.entity.ProductDetail;
 import com.thuy.shopeeproject.exceptions.CustomErrorException;
 import com.thuy.shopeeproject.service.IProductDetailService;
 import com.thuy.shopeeproject.utils.AppUtils;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/details")
@@ -37,6 +31,7 @@ public class ProductDetailAPI {
     private AppUtils appUtils;
 
     @PatchMapping("/{detailId}")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> updateProductDetail(@PathVariable Long detailId,
             @Validated ProductDetailUpdateReqDTO productDetailUpdateReqDTO, BindingResult bindingResult) {
         Optional<ProductDetail> optionalProductDetail = productDetailService.findById(detailId);

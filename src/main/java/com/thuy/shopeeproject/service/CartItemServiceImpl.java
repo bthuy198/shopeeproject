@@ -163,4 +163,9 @@ public class CartItemServiceImpl implements ICartItemService {
         return cartItem;
     }
 
+    @Override
+    public CartItem findByDetailId(Long productDetailId) {
+        return cartItemRepository.findByDetailId(productDetailId);
+    }
+
 }

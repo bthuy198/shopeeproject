@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("api/users/address")
+@RequestMapping("api")
 public class UserAddressAPI {
 
     @Autowired
@@ -37,7 +39,8 @@ public class UserAddressAPI {
     @Autowired
     private IUserAddressService userAddressService;
 
-    @GetMapping("/get-all")
+    @GetMapping("admin/users/address/get-all")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> getAllUserAddress() {
         List<UserAddress> userAddressList = userAddressService.findAll();
         List<UserAddressDTO> userAddressDTOs = new ArrayList<>();
@@ -48,8 +51,8 @@ public class UserAddressAPI {
         return new ResponseEntity<>(userAddressDTOs, HttpStatus.OK);
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getUserAddressBySession(HttpServletRequest request) {
+    @GetMapping("/users/address")
+    public ResponseEntity<?> getUserAddress(HttpServletRequest request) {
         Long userId = (Long) request.getSession().getAttribute("userId");
         Optional<User> optionalUser = userService.findById(userId);
         if (!optionalUser.isPresent()) {
@@ -66,7 +69,8 @@ public class UserAddressAPI {
         return new ResponseEntity<>(userAddressDTOs, HttpStatus.OK);
     }
 
-    @GetMapping("/get-by-user")
+    @GetMapping("admin/users/address")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> getUserAddressByUserId(@RequestParam("userId") Long userId) {
 
         Optional<User> optionalUser = userService.findById(userId);
@@ -84,7 +88,8 @@ public class UserAddressAPI {
         return new ResponseEntity<>(userAddressDTOs, HttpStatus.OK);
     }
 
-    @PostMapping("")
+    @PostMapping("/users/address")
+    @PreAuthorize("hasAnyAuthority('user')")
     public ResponseEntity<?> createUserAddress(@RequestBody UserAddressDTO userAddressDTO, HttpServletRequest request) {
         Long userId = (Long) request.getSession().getAttribute("userId");
         Optional<User> optionalUser = userService.findById(userId);
@@ -115,8 +120,9 @@ public class UserAddressAPI {
         return new ResponseEntity<>(userAddress.toUserAddressDTO(), HttpStatus.CREATED);
     }
 
-    @PostMapping("/set_default_address")
-    public ResponseEntity<?> postMethodName(@RequestBody DefaulUserAddressDTO defaulUserAddressDTO,
+    @PostMapping("users/address/set_default_address")
+    @PreAuthorize("hasAnyAuthority('user')")
+    public ResponseEntity<?> setDefaultAddress(@RequestBody DefaulUserAddressDTO defaulUserAddressDTO,
             HttpServletRequest request) {
         Long userId = (Long) request.getSession().getAttribute("userId");
         Optional<User> optionalUser = userService.findById(userId);
@@ -146,4 +152,22 @@ public class UserAddressAPI {
         return new ResponseEntity<>(userAddress.toUserAddressDTO(), HttpStatus.OK);
     }
 
+    @DeleteMapping("/users/address")
+    @PreAuthorize("hasAnyAuthority('user')")
+    public ResponseEntity<?> deleteUserAddress(@RequestParam("userAddressId") Long userAddressId,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        Optional<User> optionalUser = userService.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Please sign in to delete address");
+        }
+
+        Optional<UserAddress> optionalUserAddress = userAddressService.findById(userAddressId);
+        if (!optionalUserAddress.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this user address");
+        }
+
+        userAddressService.deleteUserAddress(optionalUser.get(), optionalUserAddress.get());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

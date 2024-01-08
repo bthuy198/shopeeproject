@@ -1,9 +1,11 @@
 package com.thuy.shopeeproject.domain.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,13 +39,17 @@ public class UserPrincipal implements UserDetails {
         this.email = email;
         this.password = password;
         this.authorities = authorities;
-        this.role = eRole.getValue();
+        this.role = eRole.toString();
     }
 
     public static UserPrincipal build(User user) {
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getValue());
         authorities.add(authority);
+
+        // List<GrantedAuthority> authorities = Arrays.stream(user.getRole().values())
+        // .map(role -> new SimpleGrantedAuthority(role.name()))
+        // .collect(Collectors.toList());
         // List<GrantedAuthority> authorities = user.getRole().stream()
         // .map(role -> new SimpleGrantedAuthority(role.name()))
         // .collect(Collectors.toList());
@@ -78,6 +84,10 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     @Override

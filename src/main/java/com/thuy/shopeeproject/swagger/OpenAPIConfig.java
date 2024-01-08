@@ -32,14 +32,14 @@ public class OpenAPIConfig {
     prodServer.setDescription("Server URL in Production environment");
 
     Contact contact = new Contact();
-    contact.setEmail("bezkoder@gmail.com");
-    contact.setName("BezKoder");
-    contact.setUrl("https://www.bezkoder.com");
+    contact.setEmail("bichthuydangthi198@gmail.com");
+    contact.setName("Bich Thuy Dang");
+    contact.setUrl("https://github.com/bthuy198?tab=repositories");
 
     License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
     Info info = new Info()
-        .title("Tutorial Management API")
+        .title("Shopee Project Management API")
         .version("1.0")
         .contact(contact)
         .description("This API exposes endpoints to manage tutorials.").termsOfService("https://www.bezkoder.com/terms")

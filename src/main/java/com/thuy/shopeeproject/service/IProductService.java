@@ -14,7 +14,7 @@ import com.thuy.shopeeproject.domain.entity.Product;
 
 public interface IProductService extends IService<Product, Long> {
 
-    Page<ProductResDTO> findAll(ProductFilterReqDTO productFilterReqDTO, Pageable pageable);
+    Page<ProductResDTO> findAllProduct(ProductFilterReqDTO productFilterReqDTO, Pageable pageable);
 
     Product createProduct(ProductCreateReqDTO productCreateReqDTO, Category category);
 
@@ -23,5 +23,7 @@ public interface IProductService extends IService<Product, Long> {
     Product updateProductNoAvatar(ProductUpdateReqDTO productUpdateReqDTO, Product product, Category category);
 
     Product updateProductWithAvatar(ProductUpdateReqDTO productUpdateReqDTO, Product product);
+
+    void deleteProduct(Product p);
 
 }

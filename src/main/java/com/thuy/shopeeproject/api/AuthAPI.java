@@ -1,6 +1,8 @@
 package com.thuy.shopeeproject.api;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -78,9 +80,9 @@ public class AuthAPI {
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("cartId", user.getCart().getId());
 
-                // List<String> roles = userDetails.getAuthorities().stream()
-                // .map(item -> item.getAuthority())
-                // .collect(Collectors.toList());
+                List<String> roles = userPrincipal.getAuthorities().stream()
+                                .map(item -> item.getAuthority())
+                                .collect(Collectors.toList());
 
                 // return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                 // jwtCookie.toString())

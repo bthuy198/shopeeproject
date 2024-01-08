@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort;
 
 import com.thuy.shopeeproject.domain.dto.CartItemReqDTO;
 import com.thuy.shopeeproject.domain.dto.CartItemUpdateReqDTO;
+import com.thuy.shopeeproject.domain.dto.product.ProductAvatarDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductCreateReqDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductCreateResDTO;
 import com.thuy.shopeeproject.domain.dto.product.ProductDetailResDTO;
@@ -41,12 +42,15 @@ import com.thuy.shopeeproject.domain.entity.Cart;
 import com.thuy.shopeeproject.domain.entity.CartItem;
 import com.thuy.shopeeproject.domain.entity.Category;
 import com.thuy.shopeeproject.domain.entity.Product;
+import com.thuy.shopeeproject.domain.entity.ProductAvatar;
 import com.thuy.shopeeproject.domain.entity.ProductDetail;
 import com.thuy.shopeeproject.domain.entity.Size;
+import com.thuy.shopeeproject.domain.entity.UserAvatar;
 import com.thuy.shopeeproject.exceptions.CustomErrorException;
 import com.thuy.shopeeproject.service.ICartItemService;
 import com.thuy.shopeeproject.service.ICartService;
 import com.thuy.shopeeproject.service.ICategoryService;
+import com.thuy.shopeeproject.service.IProductAvatarService;
 import com.thuy.shopeeproject.service.IProductDetailService;
 import com.thuy.shopeeproject.service.IProductService;
 import com.thuy.shopeeproject.service.ISizeService;
@@ -56,11 +60,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@SecurityRequirement(name = "javainuseapi")
+// @SecurityRequirement(name = "javainuseapi")
 @RequestMapping("/api/products")
 public class ProductAPI {
     @Autowired
     private IProductService productService;
+
+    @Autowired
+    private IProductAvatarService productAvatarService;
 
     @Autowired
     private IProductDetailService productDetailService;
@@ -75,13 +82,9 @@ public class ProductAPI {
     private ICartItemService cartItemService;
 
     @Autowired
-    private ISizeService sizeService;
-
-    @Autowired
     private AppUtils appUtils;
 
     @GetMapping("/get-all")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> getAllProduct(@Validated ProductFilterReqDTO productFilterReqDTO,
             BindingResult bindingResult,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
@@ -90,10 +93,13 @@ public class ProductAPI {
             return appUtils.mapErrorToResponse(bindingResult);
         }
         int size = 10;
-        int currentPageNumber = productFilterReqDTO.getCurrentPageNumber();
+        int currentPageNumber = 0;
+        if (productFilterReqDTO.getCurrentPageNumber() != null) {
+            currentPageNumber = productFilterReqDTO.getCurrentPageNumber();
+        }
 
         pageable = PageRequest.of(currentPageNumber, size, Sort.by("productName").ascending());
-        Page<ProductResDTO> productResDTOS = productService.findAll(productFilterReqDTO, pageable);
+        Page<ProductResDTO> productResDTOS = productService.findAllProduct(productFilterReqDTO, pageable);
 
         return new ResponseEntity<>(productResDTOS, HttpStatus.OK);
     }
@@ -131,6 +137,7 @@ public class ProductAPI {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> createProduct(@Validated ProductCreateReqDTO productCreateReqDTO,
             BindingResult bindingResult) {
 
@@ -163,6 +170,7 @@ public class ProductAPI {
     }
 
     @PatchMapping("/{productId}")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> updateProduct(@PathVariable Long productId,
             @ModelAttribute @Validated ProductUpdateReqDTO productUpdateReqDTO,
             BindingResult bindingResult) {
@@ -216,17 +224,77 @@ public class ProductAPI {
     }
 
     @DeleteMapping("/{productId}")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> deleteProductById(@PathVariable Long productId) {
         Optional<Product> optionalProduct = productService.findById(productId);
         if (!optionalProduct.isPresent()) {
             throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product");
         }
 
-        productService.delete(optionalProduct.get());
+        productService.deleteProduct(optionalProduct.get());
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/{productId}/avatars")
+    public ResponseEntity<?> getListAvatarByProductId(@PathVariable Long productId) {
+        Optional<Product> optionalProduct = productService.findById(productId);
+        if (!optionalProduct.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product");
+        }
+        List<ProductAvatar> productAvatars = optionalProduct.get().getProductAvatars();
+        List<ProductAvatarDTO> productAvatarDTOs = new ArrayList<>();
+        for (ProductAvatar item : productAvatars) {
+            ProductAvatarDTO productAvatarDTO = item.toProductAvatarDTO();
+            productAvatarDTOs.add(productAvatarDTO);
+        }
+        return new ResponseEntity<>(productAvatarDTOs, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{productId}/avatars/{avatarId}")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public ResponseEntity<?> deleteProductAvatar(@PathVariable Long productId,
+            @PathVariable String avatarId) {
+        Optional<Product> optionalProduct = productService.findById(productId);
+        if (!optionalProduct.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product");
+        }
+
+        Optional<ProductAvatar> optionalProductAvatar = productAvatarService.findById(avatarId);
+        if (!optionalProductAvatar.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this avatar");
+        }
+
+        ProductAvatar productAvatar = optionalProductAvatar.get();
+        productAvatarService.deleteProductAvatar(optionalProduct.get(), productAvatar);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{productId}/avatars")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public ResponseEntity<?> deleteAllProductAvatar(@PathVariable Long productId) {
+        Optional<Product> optionalProduct = productService.findById(productId);
+        if (!optionalProduct.isPresent()) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product");
+        }
+
+        List<ProductAvatar> productAvatars = optionalProduct.get().getProductAvatars();
+        if (productAvatars == null) {
+            throw new CustomErrorException(HttpStatus.NOT_FOUND, "Not found this product avatar");
+        }
+        if (productAvatars.size() == 1) {
+            String fileName = productAvatars.get(0).getFileName();
+            String nullFileName = "null_" + optionalProduct.get().getId();
+            if (fileName.contains(nullFileName)) {
+                throw new CustomErrorException(HttpStatus.BAD_REQUEST, "This product don't have image to delete");
+            }
+        }
+        productAvatarService.deleteAllProductAvatar(optionalProduct.get(), productAvatars);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/{productId}/add-to-cart")
+    @PreAuthorize("hasAnyAuthority('admin', 'user')")
     public ResponseEntity<?> addToCart(@PathVariable Long productId,
             @RequestBody CartItemReqDTO cartItemReqDTO,
             HttpServletRequest request) {

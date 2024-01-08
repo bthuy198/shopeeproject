@@ -18,7 +18,7 @@ import jakarta.persistence.criteria.Predicate;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-    default Page<Product> findAll(ProductFilterReqDTO productFilterReqDTO,
+    default Page<Product> findAllProduct(ProductFilterReqDTO productFilterReqDTO,
             Pageable pageable) {
         return findAll((root, criteriaQuery, criteriaBuilder) -> {
 

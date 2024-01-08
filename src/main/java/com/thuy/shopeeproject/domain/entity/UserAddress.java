@@ -1,5 +1,7 @@
 package com.thuy.shopeeproject.domain.entity;
 
+import org.hibernate.annotations.Where;
+
 import com.thuy.shopeeproject.domain.dto.user.UserAddressDTO;
 
 import jakarta.persistence.*;
@@ -15,6 +17,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "user_address")
+@Where(clause = "deleted = false")
 public class UserAddress extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

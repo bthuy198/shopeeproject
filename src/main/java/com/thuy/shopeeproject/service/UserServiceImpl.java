@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thuy.shopeeproject.domain.dto.UserCreateReqDTO;
+import com.thuy.shopeeproject.domain.dto.user.UserFilterReqDTO;
+import com.thuy.shopeeproject.domain.dto.user.UserResDTO;
 import com.thuy.shopeeproject.domain.entity.User;
 import com.thuy.shopeeproject.domain.entity.UserAvatar;
 import com.thuy.shopeeproject.domain.entity.UserPrincipal;
@@ -147,6 +151,11 @@ public class UserServiceImpl implements IUserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return UserPrincipal.build(user);
+    }
+
+    @Override
+    public Page<UserResDTO> findAllUser(UserFilterReqDTO userFilterReqDTO, Pageable pageable) {
+        return userRepository.findAllUser(userFilterReqDTO, pageable).map(User::toUserResDTO);
     }
 
 }

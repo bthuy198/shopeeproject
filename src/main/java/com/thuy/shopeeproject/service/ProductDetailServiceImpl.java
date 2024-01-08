@@ -49,4 +49,10 @@ public class ProductDetailServiceImpl implements IProductDetailService {
         return productDetailRepository.findByProductIdAndSize(productId, sizeId);
     }
 
+    @Override
+    public ProductDetail updateProductDetail(ProductDetail productDetail) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateProductDetail'");
+    }
+
 }

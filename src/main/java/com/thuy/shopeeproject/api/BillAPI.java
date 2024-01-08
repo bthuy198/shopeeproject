@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +29,7 @@ public class BillAPI {
     private IBillService billService;
 
     @GetMapping("/get-all")
+    @PreAuthorize("hasAnyAuthority('user')")
     public ResponseEntity<?> getAllBills() {
         List<Bill> bills = billService.findAll();
         List<BillResDTO> billResDTOs = new ArrayList<>();
